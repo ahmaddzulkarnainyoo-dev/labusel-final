@@ -1,95 +1,85 @@
-import { createServerComponentClient } from '@/lib/supabase/server'
-import { getCurrentProfile } from '@/lib/auth'
-import Link from 'next/link'
+// app/dashboard/reports/page.tsx
+import { requireRole } from '@/lib/auth';
+import { createServerComponentClient } from '@/lib/supabase/server';
+import Link from 'next/link';
 
 export default async function ReportsPage() {
-  const profile = await getCurrentProfile()
-  if (!profile) return <div>Loading...</div>
+  await requireRole('gubernur');
+  const supabase = createServerComponentClient();
 
-  const supabase = createServerComponentClient()
-
-  // Ambil laporan berdasarkan role
-  let query = supabase.from('reports').select('*, dinas:nama, profiles:full_name')
-  if (profile.role === 'kepala_dinas') {
-    query = query.eq('dinas_id', profile.dinas_id)
-  }
-  // Staf hanya bisa lihat laporan sendiri (nanti di filter di client atau query)
-  if (profile.role === 'staf') {
-    query = query.eq('created_by', profile.id)
-  }
-  // Gubernur lihat semua
-
-  const { data: reports, error } = await query.order('created_at', { ascending: false })
+  const { data: reports, error } = await supabase
+    .from('reports')
+    .select(`
+      *,
+      profiles:created_by (
+        full_name,
+        role
+      )
+    `)
+    .order('created_at', { ascending: false });
 
   if (error) {
-    console.error(error)
-    return <div className="text-red-600">Gagal mengambil data laporan</div>
+    console.error('Error fetching reports:', error);
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Daftar Laporan</h1>
-        {(profile.role === 'kepala_dinas' || profile.role === 'staf') && (
-          <Link
-            href="/dashboard/reports/new"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            + Buat Laporan
-          </Link>
-        )}
-      </div>
+    <div className="max-w-7xl mx-auto">
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Laporan Masuk</h1>
+      <p className="text-gray-600 mb-8">
+        Semua laporan dari Kepala Dinas dan Staf.
+      </p>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        {reports && reports.length > 0 ? (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dinas</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {reports.map((report: any) => (
-                <tr key={report.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-900">{report.title}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{report.dinas?.nama || '-'}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      report.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      report.status === 'approved' ? 'bg-green-100 text-green-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {report.status === 'pending' ? 'Pending' :
-                       report.status === 'approved' ? 'Disetujui' : 'Ditolak'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {new Date(report.created_at).toLocaleDateString('id-ID')}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-blue-600 hover:text-blue-800">
-                    <Link href={`/dashboard/reports/${report.id}`}>Lihat</Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div className="p-6 text-center text-gray-500">
-            Belum ada laporan.
-            {(profile.role === 'kepala_dinas' || profile.role === 'staf') && (
-              <div className="mt-2">
-                <Link href="/dashboard/reports/new" className="text-blue-600 hover:underline">
-                  Buat laporan pertama
+      {reports && reports.length > 0 ? (
+        <div className="space-y-4">
+          {reports.map((report) => (
+            <div key={report.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">{report.title}</h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Oleh: {report.profiles?.full_name || 'Unknown'} •{' '}
+                    {new Date(report.created_at).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </p>
+                </div>
+                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  report.status === 'read' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {report.status === 'read' ? 'Sudah Dibaca' : 'Belum Dibaca'}
+                </span>
+              </div>
+              <p className="mt-3 text-gray-700 line-clamp-3">{report.content}</p>
+              <div className="mt-4 flex gap-3">
+                {report.attachment_url && (
+                  <a
+                    href={report.attachment_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:text-blue-700"
+                  >
+                    📎 Lihat Lampiran
+                  </a>
+                )}
+                <Link
+                  href={`/dashboard/reports/${report.id}`}
+                  className="text-sm text-blue-600 hover:text-blue-700"
+                >
+                  Lihat Detail →
                 </Link>
               </div>
-            )}
-          </div>
-        )}
-      </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+          <p className="text-gray-500">Belum ada laporan masuk.</p>
+        </div>
+      )}
     </div>
-  )
+  );
 }
