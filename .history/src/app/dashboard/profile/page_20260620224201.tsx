@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 export default function ProfilePage() {
-  const [name, setName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
   const [dinasName, setDinasName] = useState('');
@@ -45,7 +45,7 @@ export default function ProfilePage() {
         .single();
 
       if (profile) {
-        setName(profile.name || '');
+        setFullName(profile.full_name || '');
         setRole(profile.role || '');
         setDinasName(profile.dinas?.nama || '-');
       }
@@ -69,7 +69,7 @@ export default function ProfilePage() {
 
     const { error } = await supabase
       .from('profiles')
-      .update({ name: name })
+      .update({ full_name: fullName })
       .eq('id', user.id);
 
     if (error) {
@@ -144,14 +144,14 @@ export default function ProfilePage() {
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Update Nama</h2>
           <form onSubmit={handleUpdateProfile}>
             <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  Nama Lengkap
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+                Nama Lengkap
+              </label>
+              <input
+                id="fullName"
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
                 required
               />
