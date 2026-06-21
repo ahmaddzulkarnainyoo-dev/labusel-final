@@ -126,16 +126,6 @@ export default async function DashboardLayout({
             Absensi
           </Link>
 
-          {/* Laporan Absensi - hanya Gubernur */}
-          {role === 'gubernur' && (
-            <Link
-              href="/dashboard/absensi/laporan"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-100"
-            >
-              Laporan Absensi
-            </Link>
-          )}
-
           {/* Profil - semua role */}
           <Link
             href="/dashboard/profile"

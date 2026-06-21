@@ -1,0 +1,234 @@
+// app/dashboard/absensi/kepala-dinas/page.tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+
+interface Staff {
+  id: string;
+  full_name: string;
+  role: string;
+  dinas_id: string;
+}
+
+interface Attendance {
+  id: string;
+  check_in_time: string;
+  tanggal: string;
+  photo_url: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  status: string;
+}
+
+export default function KepalaDinasAbsensiPage() {
+  const [staffList, setStaffList] = useState<Staff[]>([]);
+  const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
+  const [attendanceHistory, setAttendanceHistory] = useState<Attendance[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const router = useRouter();
+  const supabase = createClient();
+
+  // 1. Ambil daftar staf di dinas yang sama
+  useEffect(() => {
+    const fetchStaff = async () => {
+      setLoading(true);
+      // Ambil profile kepala dinas
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('dinas_id')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError || !profile) {
+        setError('Gagal memuat profil. Pastikan Anda adalah Kepala Dinas.');
+        setLoading(false);
+        return;
+      }
+
+      const dinasId = profile.dinas_id;
+
+      // Ambil semua staf di dinas yang sama (termasuk diri sendiri? kita filter hanya 'staf')
+      const { data: staff, error: staffError } = await supabase
+        .from('profiles')
+        .select('id, full_name, role, dinas_id')
+        .eq('dinas_id', dinasId)
+        .eq('role', 'staf')
+        .order('full_name', { ascending: true });
+
+      if (staffError) {
+        setError('Gagal memuat daftar staf: ' + staffError.message);
+      } else {
+        setStaffList(staff || []);
+      }
+      setLoading(false);
+    };
+
+    fetchStaff();
+  }, [supabase, router]);
+
+  // 2. Fungsi untuk mengambil riwayat absen staf tertentu
+  const fetchAttendance = async (staffId: string) => {
+    const { data, error } = await supabase
+      .from('absensi')
+      .select('*')
+      .eq('user_id', staffId)
+      .order('check_in_time', { ascending: false });
+
+    if (error) {
+      alert('Gagal memuat riwayat: ' + error.message);
+      return;
+    }
+    setAttendanceHistory(data || []);
+    setShowModal(true);
+  };
+
+  // 3. Fungsi untuk menutup modal
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedStaff(null);
+    setAttendanceHistory([]);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500">Memuat data...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-lg">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-4">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-xl font-bold text-gray-900">Absensi Staf</h1>
+        <button
+          onClick={() => router.push('/dashboard')}
+          className="text-sm text-blue-600"
+        >
+          ← Kembali
+        </button>
+      </div>
+
+      {/* Informasi dinas */}
+      <div className="mb-6">
+        <p className="text-sm text-gray-600">
+          Daftar staf di dinas Anda. Klik "Lihat Riwayat" untuk melihat absen staf.
+        </p>
+      </div>
+
+      {/* Daftar staf */}
+      {staffList.length === 0 ? (
+        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 text-center">
+          <p className="text-gray-500">Belum ada staf di dinas ini.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {staffList.map((staff) => (
+            <div
+              key={staff.id}
+              className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between"
+            >
+              <div>
+                <p className="font-medium text-gray-900">{staff.full_name}</p>
+                <p className="text-xs text-gray-500 capitalize">{staff.role}</p>
+              </div>
+              <button
+                onClick={() => {
+                  setSelectedStaff(staff);
+                  fetchAttendance(staff.id);
+                }}
+                className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 active:scale-95 transition"
+              >
+                Lihat Riwayat
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Modal Riwayat Absen */}
+      {showModal && selectedStaff && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-xl shadow-lg max-h-[80vh] overflow-y-auto">
+            <div className="p-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white">
+              <h2 className="text-lg font-semibold">
+                Riwayat Absen: {selectedStaff.full_name}
+              </h2>
+              <button
+                onClick={closeModal}
+                className="text-gray-500 hover:text-gray-700 text-xl"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-4">
+              {attendanceHistory.length === 0 ? (
+                <p className="text-gray-500 text-sm">Belum ada absen.</p>
+              ) : (
+                <div className="space-y-4">
+                  {attendanceHistory.map((item) => (
+                    <div key={item.id} className="border-b border-gray-100 pb-3">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="font-medium text-sm">
+                            {new Date(item.check_in_time).toLocaleDateString('id-ID', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric',
+                            })}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(item.check_in_time).toLocaleTimeString('id-ID', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </p>
+                          {item.latitude && item.longitude && (
+                            <p className="text-xs text-gray-400 mt-1">
+                              📍 {item.latitude.toFixed(4)}, {item.longitude.toFixed(4)}
+                            </p>
+                          )}
+                        </div>
+                        <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                          {item.status}
+                        </span>
+                      </div>
+                      {item.photo_url && (
+                        <img
+                          src={item.photo_url}
+                          alt="Foto absen"
+                          className="mt-2 w-20 h-20 rounded-lg object-cover"
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

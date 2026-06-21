@@ -23,12 +23,6 @@ export default async function DashboardLayout({
     role === 'kepala_dinas' ? '/dashboard/kepala-dinas' :
     '/dashboard/staf';
 
-  // Tentukan path absensi berdasarkan role
-  const absensiPath =
-    role === 'gubernur' ? '/dashboard/absensi/gubernur' :
-    role === 'kepala_dinas' ? '/dashboard/absensi/kepala-dinas' :
-    '/dashboard/absensi/staf';
-
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
@@ -43,24 +37,19 @@ export default async function DashboardLayout({
             <span className="block text-xs text-gray-400">{roleLabel}</span>
           </div>
         </div>
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {/* Dashboard */}
+        <nav className="flex-1 p-4 space-y-1">
           <Link
             href={dashboardPath}
             className="block px-4 py-2 rounded-lg bg-blue-50 text-blue-700 font-medium"
           >
             Dashboard
           </Link>
-
-          {/* Pengumuman - semua role */}
           <Link
             href="/dashboard/announcements"
             className="block px-4 py-2 rounded-lg hover:bg-gray-100"
           >
             Pengumuman
           </Link>
-
-          {/* Menu untuk Gubernur */}
           {role === 'gubernur' && (
             <>
               <Link
@@ -75,41 +64,9 @@ export default async function DashboardLayout({
               >
                 Laporan Masuk
               </Link>
-              <Link
-                href="/dashboard/users"
-                className="block px-4 py-2 rounded-lg hover:bg-gray-100"
-              >
-                Kelola Pengguna
-              </Link>
-              <Link
-                href="/dashboard/calendar-markers"
-                className="block px-4 py-2 rounded-lg hover:bg-gray-100"
-              >
-                Atur Penanda Kalender
-              </Link>
             </>
           )}
-
-          {/* Menu untuk Kepala Dinas */}
-          {role === 'kepala_dinas' && (
-            <>
-              <Link
-                href="/dashboard/reports/new"
-                className="block px-4 py-2 rounded-lg hover:bg-gray-100"
-              >
-                Buat Laporan
-              </Link>
-              <Link
-                href="/dashboard/calendar-markers"
-                className="block px-4 py-2 rounded-lg hover:bg-gray-100"
-              >
-                Atur Penanda Kalender
-              </Link>
-            </>
-          )}
-
-          {/* Menu untuk Staf */}
-          {role === 'staf' && (
+          {(role === 'kepala_dinas' || role === 'staf') && (
             <Link
               href="/dashboard/reports/new"
               className="block px-4 py-2 rounded-lg hover:bg-gray-100"
@@ -117,34 +74,12 @@ export default async function DashboardLayout({
               Buat Laporan
             </Link>
           )}
-
-          {/* Absensi - semua role */}
-          <Link
-            href={absensiPath}
-            className="block px-4 py-2 rounded-lg hover:bg-gray-100"
-          >
-            Absensi
-          </Link>
-
-          {/* Laporan Absensi - hanya Gubernur */}
-          {role === 'gubernur' && (
-            <Link
-              href="/dashboard/absensi/laporan"
-              className="block px-4 py-2 rounded-lg hover:bg-gray-100"
-            >
-              Laporan Absensi
-            </Link>
-          )}
-
-          {/* Profil - semua role */}
           <Link
             href="/dashboard/profile"
             className="block px-4 py-2 rounded-lg hover:bg-gray-100"
           >
             Profil
           </Link>
-
-          {/* Logout */}
           <LogoutButton />
         </nav>
       </aside>
