@@ -3,22 +3,9 @@ import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden">
-      {/* Peta Indonesia Background */}
-      <div
-        className="fixed inset-0 z-0 opacity-[0.08] pointer-events-none"
-        style={{
-          backgroundImage: 'url(/images/peta-indonesia.svg)',
-          backgroundSize: 'contain',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          animation: 'breatheMap 10s ease-in-out infinite',
-        }}
-      />
-      <div className="fixed inset-0 z-0 bg-gradient-to-b from-white/80 via-white/50 to-white/80 pointer-events-none" />
-
+    <div className="min-h-screen bg-white">
       {/* Navbar */}
-      <nav className="relative z-10 border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
@@ -44,7 +31,7 @@ export default function Home() {
       </nav>
 
       {/* Hero */}
-      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 text-center">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 text-center">
         <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight">
           Platform Digital{' '}
           <span className="text-blue-600">Pemerintahan</span>
@@ -72,7 +59,7 @@ export default function Home() {
       </section>
 
       {/* Fitur */}
-      <section className="relative z-10 bg-gray-50 py-16">
+      <section className="bg-gray-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Fitur Utama
@@ -100,18 +87,9 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="relative z-10 bg-white border-t border-gray-200 py-8 text-center text-sm text-gray-500">
+      <footer className="bg-white border-t border-gray-200 py-8 text-center text-sm text-gray-500">
         &copy; {new Date().getFullYear()} Pemerintah Kabupaten Labuhanbatu Selatan.
       </footer>
-
-      {/* Global styles for animation */}
-      <style jsx global>{`
-        @keyframes breatheMap {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.05); }
-          100% { transform: scale(1); }
-        }
-      `}</style>
     </div>
   );
 }

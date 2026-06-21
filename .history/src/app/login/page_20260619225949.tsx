@@ -1,7 +1,7 @@
 // app/login/page.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -11,17 +11,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [loadingPage, setLoadingPage] = useState(true);
   const router = useRouter();
   const supabase = createClient();
-
-  useEffect(() => {
-    // Simulasi loading halaman sebentar agar user tidak melihat flash kosong
-    const timer = setTimeout(() => {
-      setLoadingPage(false);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -41,17 +32,6 @@ export default function LoginPage() {
 
     router.push('/dashboard');
   };
-
-  if (loadingPage) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
-          <p className="text-sm text-gray-500">Memuat halaman login...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -109,16 +89,9 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  <span className="font-semibold">Memproses...</span>
-                </>
-              ) : (
-                'Masuk'
-              )}
+              {loading ? 'Memproses...' : 'Masuk'}
             </button>
           </form>
         </div>

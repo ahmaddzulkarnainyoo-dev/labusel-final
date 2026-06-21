@@ -1,26 +1,13 @@
-// app/dashboard/kepala-dinas/page.tsx
+// app/dashboard/gubernur/page.tsx
 import { requireRole } from '@/lib/auth';
 import { createServerComponentClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 
-export default async function KepalaDinasDashboard() {
-  const profile = await requireRole('kepala_dinas');
+export default async function GubernurDashboard() {
+  await requireRole('gubernur');
   const supabase = createServerComponentClient();
 
-  const dinasId = profile.dinas_id;
-  const kepalaDinasId = profile.id;
-
-  // 1. Ambil semua staf di dinas yang sama (termasuk kepala dinas sendiri)
-  const { data: staff } = await supabase
-    .from('profiles')
-    .select('id, full_name, role')
-    .eq('dinas_id', dinasId)
-    .in('role', ['staf', 'kepala_dinas']);
-
-  const staffIds = staff?.map((s) => s.id) || [];
-  const totalStaff = staff?.length || 0;
-
-  // 2. Ambil semua laporan dari staf di dinas ini
+  // 1. Ambil semua laporan (pakai any untuk bypass TypeScript)
   const { data: reportsRaw } = await supabase
     .from('reports')
     .select(`
@@ -29,41 +16,55 @@ export default async function KepalaDinasDashboard() {
       status,
       created_at,
       profiles:created_by (
-        full_name
+        full_name,
+        dinas_id,
+        dinas:dinas_id (
+          nama
+        )
       )
     `)
-    .in('created_by', staffIds)
     .order('created_at', { ascending: false });
 
   const reports = reportsRaw as any[];
-  const totalReports = reports?.length || 0;
-  const unreadReports = reports?.filter((r) => r.status === 'unread').length || 0;
-  const readReports = reports?.filter((r) => r.status === 'read').length || 0;
 
-  // 3. Grafik laporan per staf
-  const staffMap = new Map();
-  reports?.forEach((report) => {
-    const name = report.profiles?.full_name || 'Tidak Diketahui';
-    staffMap.set(name, (staffMap.get(name) || 0) + 1);
+  // 2. Ambil total pengumuman
+  const { count: totalAnnouncements } = await supabase
+    .from('announcements')
+    .select('*', { count: 'exact', head: true });
+
+  // 3. Ambil total aduan (pakai try-catch)
+  let totalAduan = 0;
+  try {
+    const { count } = await supabase
+      .from('aduan')
+      .select('*', { count: 'exact', head: true });
+    totalAduan = count || 0;
+  } catch {
+    totalAduan = 0;
+  }
+
+  // 4. Hitung statistik
+  const totalReports = reports?.length || 0;
+  const unreadReports = reports?.filter((r: any) => r.status === 'unread').length || 0;
+
+  // 5. Group laporan per dinas
+  const dinasMap = new Map();
+  reports?.forEach((report: any) => {
+    const dinasName = report.profiles?.dinas?.nama || 'Tidak Diketahui';
+    dinasMap.set(dinasName, (dinasMap.get(dinasName) || 0) + 1);
   });
-  const staffStats = Array.from(staffMap.entries())
+  const dinasStats = Array.from(dinasMap.entries())
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 
-  // 4. Laporan terbaru (5)
+  // 6. Laporan terbaru (5)
   const latestReports = reports?.slice(0, 5) || [];
-
-  // 5. Nama dinas (dari profile)
-  const dinasName = profile.dinas?.nama || 'Dinas Anda';
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-2 text-gray-900">Selamat Datang, Kepala Dinas</h2>
-      <p className="text-gray-500 mb-8">
-        Dashboard untuk <span className="font-medium">{dinasName}</span>.
-        {totalStaff > 0 && ` Total ${totalStaff} staf di dinas ini.`}
-      </p>
+      <h2 className="text-2xl font-bold mb-2">Selamat Datang, Gubernur</h2>
+      <p className="text-gray-500 mb-8">Ringkasan kinerja dan laporan terbaru.</p>
 
       {/* Kartu Statistik */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -98,12 +99,12 @@ export default async function KepalaDinasDashboard() {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Sudah Dibaca</p>
-              <p className="text-3xl font-bold text-green-600">{readReports}</p>
+              <p className="text-sm text-gray-500">Pengumuman</p>
+              <p className="text-3xl font-bold text-green-600">{totalAnnouncements || 0}</p>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
               <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
               </svg>
             </div>
           </div>
@@ -112,12 +113,12 @@ export default async function KepalaDinasDashboard() {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Total Staf</p>
-              <p className="text-3xl font-bold text-purple-600">{totalStaff}</p>
+              <p className="text-sm text-gray-500">Aduan Masyarakat</p>
+              <p className="text-3xl font-bold text-purple-600">{totalAduan}</p>
             </div>
             <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
               <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
               </svg>
             </div>
           </div>
@@ -125,12 +126,12 @@ export default async function KepalaDinasDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Grafik Laporan per Staf */}
+        {/* Grafik Laporan per Dinas */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <h3 className="text-lg font-semibold mb-4">📊 Laporan per Staf</h3>
-          {staffStats.length > 0 ? (
+          <h3 className="text-lg font-semibold mb-4">📊 Laporan per Dinas (Teratas)</h3>
+          {dinasStats.length > 0 ? (
             <div className="space-y-3">
-              {staffStats.map((item, idx) => (
+              {dinasStats.map((item, idx) => (
                 <div key={idx}>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-gray-700">{item.name}</span>
@@ -139,14 +140,14 @@ export default async function KepalaDinasDashboard() {
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-blue-600 h-2 rounded-full"
-                      style={{ width: `${(item.count / (staffStats[0]?.count || 1)) * 100}%` }}
+                      style={{ width: `${(item.count / (dinasStats[0]?.count || 1)) * 100}%` }}
                     />
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-sm">Belum ada laporan dari staf.</p>
+            <p className="text-gray-500 text-sm">Belum ada data laporan.</p>
           )}
         </div>
 
@@ -160,7 +161,7 @@ export default async function KepalaDinasDashboard() {
           </div>
           {latestReports.length > 0 ? (
             <div className="space-y-3">
-              {latestReports.map((report) => (
+              {latestReports.map((report: any) => (
                 <Link
                   key={report.id}
                   href={`/dashboard/reports/${report.id}`}
@@ -172,7 +173,7 @@ export default async function KepalaDinasDashboard() {
                         {report.title}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {report.profiles?.full_name || 'Staf'} • {new Date(report.created_at).toLocaleDateString('id-ID')}
+                        {report.profiles?.full_name || 'Unknown'} • {new Date(report.created_at).toLocaleDateString('id-ID')}
                       </p>
                     </div>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -185,7 +186,7 @@ export default async function KepalaDinasDashboard() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-sm">Belum ada laporan dari staf.</p>
+            <p className="text-gray-500 text-sm">Belum ada laporan masuk.</p>
           )}
         </div>
       </div>
