@@ -82,48 +82,12 @@ function BarChart() {
 }
 
 export default function Home() {
-  const [showSplash, setShowSplash] = useState(true);
-
   useEffect(() => {
     AOS.init({
       duration: 800,
       once: true,
     });
   }, []);
-
-  useEffect(() => {
-    if (showSplash) {
-      document.body.style.overflow = 'hidden';
-      const timer = setTimeout(() => {
-        setShowSplash(false);
-        document.body.style.overflow = '';
-      }, 2500);
-      return () => clearTimeout(timer);
-    }
-  }, [showSplash]);
-
-  if (showSplash) {
-    return (
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center"
-        style={{ background: 'linear-gradient(135deg, #0B1A33 0%, #1A3A6B 100%)' }}
-      >
-        <div
-          className="animate-[fadeInScale_1.5s_ease-out_forwards]"
-          style={{ animation: 'fadeInScale 1.5s ease-out forwards' }}
-        >
-          <Image
-            src="/images/logo.jpg"
-            alt="Labusel"
-            width={256}
-            height={256}
-            className="w-48 md:w-64 h-auto shadow-xl rounded-2xl border-4 border-white/20"
-            priority
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen font-sans">
