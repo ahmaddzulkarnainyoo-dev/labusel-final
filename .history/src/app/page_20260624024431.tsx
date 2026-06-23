@@ -97,7 +97,7 @@ export default function Home() {
       const timer = setTimeout(() => {
         setShowSplash(false);
         document.body.style.overflow = '';
-      }, 4000);
+      }, 2500);
       return () => clearTimeout(timer);
     }
   }, [showSplash]);
@@ -105,10 +105,9 @@ export default function Home() {
   if (showSplash) {
     return (
       <div
-        className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden"
+        className="fixed inset-0 z-50 flex items-center justify-center"
         style={{ background: 'linear-gradient(135deg, #0B1A33 0%, #1A3A6B 100%)' }}
       >
-        {/* Logo */}
         <div
           className="animate-[fadeInScale_1.5s_ease-out_forwards]"
           style={{ animation: 'fadeInScale 1.5s ease-out forwards' }}
@@ -122,28 +121,6 @@ export default function Home() {
             priority
           />
         </div>
-
-        {/* Decorative Line */}
-        <div
-          className="w-16 h-0.5 bg-white/30 mt-6"
-          style={{ animation: 'fadeIn 0.6s ease-out 0.3s forwards' }}
-        />
-
-        {/* Title */}
-        <h1
-          className="text-3xl md:text-5xl font-bold text-white tracking-wider mt-6"
-          style={{ animation: 'slideUpFade 0.8s ease-out 0.5s forwards' }}
-        >
-          Labusel Gov
-        </h1>
-
-        {/* Slogan */}
-        <p
-          className="text-sm md:text-lg text-blue-200 italic mt-3 border-b-2 border-blue-400/30 pb-2"
-          style={{ animation: 'fadeIn 0.6s ease-out 1.2s forwards' }}
-        >
-          &ldquo;Santun Berkata, Bijak Berkarya&rdquo;
-        </p>
       </div>
     );
   }
@@ -161,7 +138,7 @@ export default function Home() {
           <div className="flex justify-between items-center h-16 md:h-20">
             <div className="flex items-center gap-2">
               <Image
-                src="/images/logo.png"
+                src="/images/logo.jpg"
                 alt="Labusel"
                 width={40}
                 height={40}
@@ -438,7 +415,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Image
-                src="/images/logo.png"
+                src="/images/logo.jpg"
                 alt="Labusel"
                 width={32}
                 height={32}

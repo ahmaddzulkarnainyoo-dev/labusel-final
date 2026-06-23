@@ -97,7 +97,7 @@ export default function Home() {
       const timer = setTimeout(() => {
         setShowSplash(false);
         document.body.style.overflow = '';
-      }, 4000);
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [showSplash]);
