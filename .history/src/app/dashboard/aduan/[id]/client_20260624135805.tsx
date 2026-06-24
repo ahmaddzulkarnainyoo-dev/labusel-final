@@ -117,7 +117,7 @@ export function AduanDetailClient({ aduan, dokumentasi, dinasList, role, profile
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Detail Aduan */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-xl font-bold text-gray-900">Detail Aduan</h1>
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(aduan.status)}`}>
@@ -208,7 +208,7 @@ export function AduanDetailClient({ aduan, dokumentasi, dinasList, role, profile
 
         {/* Update Status Panel */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 sticky top-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Update Status</h2>
 
             {message && (
@@ -258,7 +258,7 @@ export function AduanDetailClient({ aduan, dokumentasi, dinasList, role, profile
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-blue-600 text-white py-2.5 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Menyimpan...' : 'Update Status'}
               </button>
