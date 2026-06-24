@@ -5,7 +5,7 @@ import { getCurrentProfile } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { LogoutButton } from '@/components/LogoutButton';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export default function DashboardLayout({
   children,
@@ -16,13 +16,13 @@ export default function DashboardLayout({
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  useState(() => {
     getCurrentProfile().then((p) => {
       setProfile(p);
       if (!p) redirect('/login');
       setLoading(false);
     });
-  }, []);
+  });
 
   if (loading) {
     return (
