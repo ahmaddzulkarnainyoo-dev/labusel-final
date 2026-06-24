@@ -169,11 +169,13 @@ export default function Home() {
         <h1
           className="text-3xl md:text-5xl font-bold tracking-wider mt-6 relative"
           style={{
+            animation: 'slideUpFade 0.8s ease-out 0.5s forwards',
             background: 'linear-gradient(90deg, #ffffff, #60A5FA, #ffffff, #60A5FA, #ffffff)',
             backgroundSize: '200% auto',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
+            animationDelay: '0.5s, 2s',
             animation: 'slideUpFade 0.8s ease-out 0.5s forwards, shimmer 3s linear infinite',
             backgroundPosition: '200% center',
           }}

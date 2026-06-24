@@ -128,7 +128,7 @@ export default function AnnouncementsPage() {
         filteredQuery = filteredQuery.or(`target_dinas_id.cs.{${profile.dinas_id}},target_dinas_id.is.null`);
       }
 
-      // Filter by target dinas (for bupati)
+      // Filter by target dinas (for gubernur)
       if (filterDinas) {
         if (filterDinas === 'all') {
           filteredQuery = filteredQuery.is('target_dinas_id', null);
@@ -174,7 +174,7 @@ export default function AnnouncementsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Pengumuman</h1>
           <p className="text-gray-600 mt-1">
-            Semua pengumuman dari Bupati Labuhanbatu Selatan
+            Semua pengumuman dari Gubernur Labuhanbatu Selatan
           </p>
         </div>
         {profile.role === 'gubernur' && (
@@ -190,7 +190,7 @@ export default function AnnouncementsPage() {
       {/* Filter Section */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6">
         <div className="flex flex-wrap gap-4 items-end">
-          {/* Filter Dinas (only for bupati) */}
+          {/* Filter Dinas (only for gubernur) */}
           {profile.role === 'gubernur' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Target Dinas</label>
@@ -275,7 +275,7 @@ export default function AnnouncementsPage() {
                   </h3>
                   <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
                     <span>
-                    Oleh: {announcement.profiles?.name || 'Bupati'}
+                    Oleh: {announcement.profiles?.name || 'Gubernur'}
                     </span>
                     <span>•</span>
                     <span>

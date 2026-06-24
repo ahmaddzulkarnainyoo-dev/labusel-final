@@ -103,44 +103,15 @@ export default function Home() {
   }, [showSplash]);
 
   if (showSplash) {
-    // Generate star positions
-    const stars = Array.from({ length: 40 }, (_, i) => ({
-      id: i,
-      top: `${Math.random() * 100}%`,
-      left: `${Math.random() * 100}%`,
-      size: `${2 + Math.random() * 3}px`,
-      delay: `${Math.random() * 3}s`,
-      duration: `${1.5 + Math.random() * 2}s`,
-    }));
-
     return (
       <div
         className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #0B1A33 0%, #1A3A6B 100%)', willChange: 'transform, opacity' }}
+        style={{ background: 'linear-gradient(135deg, #0B1A33 0%, #1A3A6B 100%)' }}
       >
-        {/* Star Particles */}
-        <div className="absolute inset-0 pointer-events-none">
-          {stars.map((star) => (
-            <div
-              key={star.id}
-              className="absolute rounded-full bg-white"
-              style={{
-                top: star.top,
-                left: star.left,
-                width: star.size,
-                height: star.size,
-                animation: `twinkle ${star.duration} ease-in-out infinite`,
-                animationDelay: star.delay,
-                boxShadow: '0 0 4px rgba(255,255,255,0.6)',
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Logo with Glow */}
+        {/* Logo */}
         <div
-          className="relative"
-          style={{ animation: 'fadeInScale 1.5s ease-out forwards, pulseGlow 2s ease-in-out infinite' }}
+          className="animate-[fadeInScale_1.5s_ease-out_forwards]"
+          style={{ animation: 'fadeInScale 1.5s ease-out forwards' }}
         >
           <Image
             src="/images/logo.png"
@@ -148,35 +119,20 @@ export default function Home() {
             width={256}
             height={256}
             className="w-48 md:w-64 h-auto shadow-xl rounded-2xl border-4 border-white/20"
-            style={{ filter: 'drop-shadow(0 0 30px rgba(37, 99, 235, 0.6))' }}
             priority
           />
         </div>
 
-        {/* Decorative Moving Line */}
-        <div className="relative w-64 h-0.5 mt-6 overflow-hidden rounded-full">
-          <div
-            className="absolute h-full rounded-full"
-            style={{
-              background: 'linear-gradient(90deg, transparent, #60A5FA, #ffffff, #60A5FA, transparent)',
-              animation: 'lineExpand 1.2s ease-out 0.3s forwards',
-              opacity: 0,
-            }}
-          />
-        </div>
+        {/* Decorative Line */}
+        <div
+          className="w-16 h-0.5 bg-white/30 mt-6"
+          style={{ animation: 'fadeIn 0.6s ease-out 0.3s forwards' }}
+        />
 
-        {/* Title with Shimmer */}
+        {/* Title */}
         <h1
-          className="text-3xl md:text-5xl font-bold tracking-wider mt-6 relative"
-          style={{
-            background: 'linear-gradient(90deg, #ffffff, #60A5FA, #ffffff, #60A5FA, #ffffff)',
-            backgroundSize: '200% auto',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            animation: 'slideUpFade 0.8s ease-out 0.5s forwards, shimmer 3s linear infinite',
-            backgroundPosition: '200% center',
-          }}
+          className="text-3xl md:text-5xl font-bold text-white tracking-wider mt-6"
+          style={{ animation: 'slideUpFade 0.8s ease-out 0.5s forwards' }}
         >
           Labusel Gov
         </h1>
@@ -193,7 +149,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen font-sans" style={{ animation: 'fadeInPage 0.8s ease-out forwards' }}>
+    <div className="min-h-screen font-sans">
 
       {/* ===== 1. HERO SECTION ===== */}
       <section

@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Cek role bupati
+    // Cek role gubernur
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       .single()
 
     if (profile?.role !== 'gubernur') {
-      return NextResponse.json({ error: 'Only bupati can broadcast' }, { status: 403 })
+      return NextResponse.json({ error: 'Only gubernur can broadcast' }, { status: 403 })
     }
 
     const { title, content, target_dinas_ids } = await request.json()

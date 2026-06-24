@@ -233,28 +233,6 @@ export default function ReportsPage() {
         </div>
       </div>
 
-      {/* Export Buttons */}
-      <div className="flex gap-3 mb-6">
-        <a
-          href={`/api/reports/export?format=pdf&dinas=${filterDinas}&status=${filterStatus}&tanggal=${filterTanggal}&search=${searchQuery}`}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition shadow-sm"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          Export PDF
-        </a>
-        <a
-          href={`/api/reports/export?format=excel&dinas=${filterDinas}&status=${filterStatus}&tanggal=${filterTanggal}&search=${searchQuery}`}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition shadow-sm"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-          </svg>
-          Export Excel
-        </a>
-      </div>
-
       {loading ? (
         <div className="flex justify-center items-center h-32">
           <p className="text-gray-500">Memuat data...</p>

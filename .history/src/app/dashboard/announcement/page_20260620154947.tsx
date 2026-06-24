@@ -31,7 +31,7 @@ export default async function AnnouncementsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Pengumuman</h1>
           <p className="text-gray-600 mt-1">
-            Semua pengumuman dari Bupati Labuhanbatu Selatan
+            Semua pengumuman dari Gubernur Labuhanbatu Selatan
           </p>
         </div>
         {profile.role === 'gubernur' && (
@@ -58,7 +58,7 @@ export default async function AnnouncementsPage() {
                   </h3>
                   <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
                     <span>
-                      Oleh: {announcement.profiles?.full_name || 'Bupati'}
+                      Oleh: {announcement.profiles?.full_name || 'Gubernur'}
                     </span>
                     <span>•</span>
                     <span>

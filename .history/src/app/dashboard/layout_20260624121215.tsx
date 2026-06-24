@@ -60,7 +60,7 @@ export default async function DashboardLayout({
             Pengumuman
           </Link>
 
-          {/* Menu untuk Bupati */}
+          {/* Menu untuk Gubernur */}
           {role === 'gubernur' && (
             <>
               <Link
@@ -132,7 +132,7 @@ export default async function DashboardLayout({
             Absensi
           </Link>
 
-          {/* Laporan Absensi - hanya Bupati */}
+          {/* Laporan Absensi - hanya Gubernur */}
           {role === 'gubernur' && (
             <Link
               href="/dashboard/absensi/laporan"
